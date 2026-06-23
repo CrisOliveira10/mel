@@ -14,35 +14,56 @@
         .story-container {
             width: 100%; max-width: 56.25dvh; height: 100dvh; position: relative; overflow: hidden;
         }
-        /* Ajuste do CSS das páginas */
+       /* Transição Cinematográfica com Blur e Zoom */
         .page {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-size: cover; background-position: center;
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            background-size: cover; 
+            background-position: center;
             opacity: 0; 
             visibility: hidden;
-            transition: opacity 0.8s ease, transform 0.8s ease;
-            transform: translateY(20px); /* Começa levemente abaixo */
+            
+            /* O segredo: Blur inicial e um leve zoom */
+            filter: blur(20px); 
+            transform: scale(1.05); 
+            
+            /* Duração de 1 segundo para ficar bem fluido */
+            transition: opacity 1s ease, filter 1s ease, transform 1s ease;
             z-index: 10;
         }
+
         .page.active { 
             opacity: 1; 
             visibility: visible;
-            transform: translateY(0); /* Desliza para o lugar */
+            filter: blur(0px); /* O borrão desaparece quando a página ativa */
+            transform: scale(1); /* O zoom volta ao normal */
         }
         
         /* Drag P1 */
         #drag-el {
-            position: fixed; /* Isso faz ele flutuar sobre tudo */
-            width: 80px; 
-            height: 80px; 
+            position: fixed;
+            bottom: 12%; /* Inicia na posição de retorno */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 80px;
             background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782230953/elemento_tdqwih.png');
-            background-size: contain; 
-            background-repeat: no-repeat; 
+            background-size: contain;
+            background-repeat: no-repeat;
             background-position: center;
-            z-index: 9999; /* Garante que ele fique acima de qualquer outra camada */
-            cursor: grab; 
+            z-index: 9999;
+            cursor: grab;
             touch-action: none;
-            /* Removemos o bottom e left iniciais para controlar via JS */
+            animation: pulsar 2s infinite ease-in-out; /* Efeito de pulsar */
+        }
+
+        @keyframes pulsar {
+            0% { transform: translateX(-50%) scale(1); filter: brightness(1); }
+            50% { transform: translateX(-50%) scale(1.1); filter: brightness(1.2); }
+            100% { transform: translateX(-50%) scale(1); filter: brightness(1); }
         }
 
         /* P2 Video */
@@ -88,19 +109,19 @@
         </div>
 
         <div id="page-3" class="page" style="background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782222593/pagina3_lofl13.jpg');">
-      <a href="https://wa.me/5571993233142" target="_blank" class="hotspot" style="top:49.52%; left:11.80%; width:22.54%; height:17.60%;"></a>
-      <a href="https://maps.app.goo.gl/HFHwpFUTUmKPLjcHA" target="_blank" class="hotspot" style="top:48.94%; left:39.26%; width:24.30%; height:19.92%;"></a>
-      <div class="hotspot" onclick="goToPage(4)" style="top:48.94%; left:67.08%; width:23.94%; height:20.70%;"></div>
+      <a href="https://wa.me/5571993233142" target="_blank" class="hotspot" style="top:49.71%; left:7.92%; width:26.76%; height:17.21%;"></a>
+      <a href="https://maps.app.goo.gl/HFHwpFUTUmKPLjcHA" target="_blank" class="hotspot" style="top:49.32%; left:40.32%; width:23.94%; height:17.02%;"></a>
+      <div class="hotspot" onclick="goToPage(4)" style="top:47.97%; left:69.54%; width:21.48%; height:18.57%;"></div>
         </div>
 
         <div id="page-4" class="page" style="background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782222618/pagina4_b1amox.jpg');">
             <button class="btn-back" onclick="goToPage(3)">✕ Voltar</button>
-      <div class="hotspot" onclick="goToPage(5)" style="top:44.10%; left:15.67%; width:69.01%; height:13.35%;"></div>
+      <div class="hotspot" onclick="goToPage(5)" style="top:45.84%; left:23.42%; width:58.45%; height:11.22%;"></div>
         </div>
 
         <div id="page-5" class="page" style="background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782229806/pagina5_eyreqe.jpg');">
             <button class="btn-back" onclick="goToPage(3)">✕ Voltar</button>
-      <div class="hotspot" onclick="goToPage(6)" style="top:45.65%; left:9.33%; width:83.45%; height:10.64%;"></div>
+      <div class="hotspot" onclick="goToPage(6)" style="top:43.71%; left:11.09%; width:78.17%; height:11.22%;"></div>
         </div>
 
         <div id="page-6" class="page" style="background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782229835/pagina6_bjsg2v.jpg');">
@@ -116,12 +137,13 @@
         const btnSound = document.getElementById('btn-sound');
         const isVideo = true;
 
-       // Lógica de Arrastar Livre com Gatilho no Soltar
+      // Lógica de Arrastar Livre
         let isDragging = false;
         let offsetX, offsetY;
 
         const startDrag = (e) => {
             isDragging = true;
+            dragEl.style.animation = 'none'; // Para de pulsar ao tocar
             const clientX = e.clientX || e.touches[0].clientX;
             const clientY = e.clientY || e.touches[0].clientY;
             
@@ -140,30 +162,26 @@
             
             dragEl.style.left = (clientX - offsetX) + 'px';
             dragEl.style.top = (clientY - offsetY) + 'px';
+            dragEl.style.bottom = 'auto';
+            dragEl.style.transform = 'none'; 
         };
 
         const endDrag = (e) => {
             if(!isDragging) return;
             isDragging = false;
-            
-            // Pega a posição final do elemento ao soltar
+            dragEl.style.animation = 'pulsar 2s infinite ease-in-out'; // Volta a pulsar
+
             const rect = dragEl.getBoundingClientRect();
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;
             
-            // Verifica se o centro do elemento está próximo ao centro da tela (margem de 100px)
+            // Verifica se está no centro
             const distX = Math.abs((rect.left + rect.width/2) - centerX);
             const distY = Math.abs((rect.top + rect.height/2) - centerY);
             
             if (distX < 100 && distY < 100) {
                  audio.play().catch(e => console.log(e));
                  goToPage(2);
-            } else {
-                // Se soltou fora do centro, ele volta para a posição inicial (opcional)
-                dragEl.style.transition = 'all 0.5s ease';
-                dragEl.style.left = '50%';
-                dragEl.style.top = '80%';
-                dragEl.style.transform = 'translateX(-50%)';
             }
         };
 
