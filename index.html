@@ -32,10 +32,17 @@
         
         /* Drag P1 */
         #drag-el {
-            position: absolute; bottom: 12%; left: 50%; transform: translateX(-50%);
-            width: 80px; height: 80px; background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782230953/elemento_tdqwih.png');
-            background-size: contain; background-repeat: no-repeat; background-position: center;
-            z-index: 50; cursor: grab; touch-action: none;
+            position: fixed; /* Isso faz ele flutuar sobre tudo */
+            width: 80px; 
+            height: 80px; 
+            background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782230953/elemento_tdqwih.png');
+            background-size: contain; 
+            background-repeat: no-repeat; 
+            background-position: center;
+            z-index: 9999; /* Garante que ele fique acima de qualquer outra camada */
+            cursor: grab; 
+            touch-action: none;
+            /* Removemos o bottom e left iniciais para controlar via JS */
         }
 
         /* P2 Video */
@@ -81,19 +88,19 @@
         </div>
 
         <div id="page-3" class="page" style="background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782222593/pagina3_lofl13.jpg');">
-      <div class="hotspot" onclick="goToPage(4)" style="top:48.55%; left:68.13%; width:23.59%; height:18.76%;"></div>
-      <a href="https://maps.app.goo.gl/HFHwpFUTUmKPLjcHA" target="_blank" class="hotspot" style="top:50.48%; left:37.50%; width:24.30%; height:17.79%;"></a>
-      <a href="https://wa.me/5571993233142" target="_blank" class="hotspot" style="top:50.10%; left:10.74%; width:24.30%; height:19.54%;"></a>
+      <a href="https://wa.me/5571993233142" target="_blank" class="hotspot" style="top:49.52%; left:11.80%; width:22.54%; height:17.60%;"></a>
+      <a href="https://maps.app.goo.gl/HFHwpFUTUmKPLjcHA" target="_blank" class="hotspot" style="top:48.94%; left:39.26%; width:24.30%; height:19.92%;"></a>
+      <div class="hotspot" onclick="goToPage(4)" style="top:48.94%; left:67.08%; width:23.94%; height:20.70%;"></div>
         </div>
 
         <div id="page-4" class="page" style="background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782222618/pagina4_b1amox.jpg');">
             <button class="btn-back" onclick="goToPage(3)">✕ Voltar</button>
-      <div class="hotspot" onclick="goToPage(5)" style="top:45.26%; left:30.11%; width:36.62%; height:8.90%;"></div>
+      <div class="hotspot" onclick="goToPage(5)" style="top:44.10%; left:15.67%; width:69.01%; height:13.35%;"></div>
         </div>
 
         <div id="page-5" class="page" style="background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782229806/pagina5_eyreqe.jpg');">
             <button class="btn-back" onclick="goToPage(3)">✕ Voltar</button>
-      <div class="hotspot" onclick="goToPage(6)" style="top:45.45%; left:37.15%; width:38.73%; height:24.37%;"></div>
+      <div class="hotspot" onclick="goToPage(6)" style="top:45.65%; left:9.33%; width:83.45%; height:10.64%;"></div>
         </div>
 
         <div id="page-6" class="page" style="background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782229835/pagina6_bjsg2v.jpg');">
@@ -109,7 +116,7 @@
         const btnSound = document.getElementById('btn-sound');
         const isVideo = true;
 
-        // Lógica de Arrastar Livre
+       // Lógica de Arrastar Livre com Gatilho no Soltar
         let isDragging = false;
         let offsetX, offsetY;
 
@@ -118,7 +125,6 @@
             const clientX = e.clientX || e.touches[0].clientX;
             const clientY = e.clientY || e.touches[0].clientY;
             
-            // Calcula a distância do clique até o centro do elemento
             offsetX = clientX - dragEl.getBoundingClientRect().left - (dragEl.offsetWidth / 2);
             offsetY = clientY - dragEl.getBoundingClientRect().top - (dragEl.offsetHeight / 2);
             
@@ -134,23 +140,33 @@
             
             dragEl.style.left = (clientX - offsetX) + 'px';
             dragEl.style.top = (clientY - offsetY) + 'px';
-            dragEl.style.bottom = 'auto'; // Remove a restrição do bottom
-            dragEl.style.transform = 'none'; // Reseta o transform do centro
+        };
+
+        const endDrag = (e) => {
+            if(!isDragging) return;
+            isDragging = false;
             
-            // Gatilho: Se arrastar para o centro da tela (exemplo)
+            // Pega a posição final do elemento ao soltar
+            const rect = dragEl.getBoundingClientRect();
+            const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;
-            if (clientY < centerY + 50 && clientY > centerY - 50) {
-                 isDragging = false;
+            
+            // Verifica se o centro do elemento está próximo ao centro da tela (margem de 100px)
+            const distX = Math.abs((rect.left + rect.width/2) - centerX);
+            const distY = Math.abs((rect.top + rect.height/2) - centerY);
+            
+            if (distX < 100 && distY < 100) {
                  audio.play().catch(e => console.log(e));
                  goToPage(2);
+            } else {
+                // Se soltou fora do centro, ele volta para a posição inicial (opcional)
+                dragEl.style.transition = 'all 0.5s ease';
+                dragEl.style.left = '50%';
+                dragEl.style.top = '80%';
+                dragEl.style.transform = 'translateX(-50%)';
             }
         };
 
-        const endDrag = () => {
-            isDragging = false;
-        };
-
-        dragEl.style.position = 'fixed'; // Garante que flutue sobre tudo
         dragEl.addEventListener('mousedown', startDrag);
         dragEl.addEventListener('touchstart', startDrag, {passive: false});
         window.addEventListener('mousemove', dragMove);
