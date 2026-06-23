@@ -15,15 +15,24 @@
             width: 100%; max-width: 56.25dvh; height: 100dvh; position: relative; overflow: hidden;
         }
         .page {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background-size: cover; background-position: center; display: none; z-index: 10;
-        }
-        .page.active { display: block; }
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background-size: cover; background-position: center;
+    opacity: 0; /* Começa invisível */
+    transition: opacity 0.8s ease, filter 0.8s ease;
+    filter: blur(10px); /* Começa embaçado */
+    display: none;
+    z-index: 10;
+}
+        .page.active { 
+    display: block; 
+    opacity: 1; 
+    filter: blur(0px); /* Foca ao aparecer */
+}
         
         /* Drag P1 */
         #drag-el {
             position: absolute; bottom: 12%; left: 50%; transform: translateX(-50%);
-            width: 80px; height: 80px; background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782222540/elemento_yryqdp.png');
+            width: 240px; height: 240px; background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782222540/elemento_yryqdp.png');
             background-size: contain; background-repeat: no-repeat; background-position: center;
             z-index: 50; cursor: grab; touch-action: none;
         }
@@ -71,9 +80,9 @@
         </div>
 
         <div id="page-3" class="page" style="background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782222593/pagina3_lofl13.jpg');">
-      <a href="https://wa.me/5571993233142" target="_blank" class="hotspot" style="top:52.42%; left:13.56%; width:19.37%; height:11.41%;"></a>
-      <a href="https://maps.app.goo.gl/1D3JBDRJyoShTRnh9" target="_blank" class="hotspot" style="top:50.87%; left:39.61%; width:25.00%; height:14.31%;"></a>
-      <div class="hotspot" onclick="goToPage(4)" style="top:49.32%; left:67.78%; width:25.00%; height:17.41%;"></div>
+      <a href="Link: https://wa.me/5571993233142" target="_blank" class="hotspot" style="top:49.52%; left:8.63%; width:26.06%; height:17.41%;"></a>
+      <a href="Link: https://maps.app.goo.gl/1D3JBDRJ" target="_blank" class="hotspot" style="top:48.74%; left:37.85%; width:26.06%; height:18.18%;"></a>
+      <div class="hotspot" onclick="goToPage(4)" style="top:48.74%; left:66.02%; width:26.76%; height:18.18%;"></div>
         </div>
 
         <div id="page-4" class="page" style="background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782222618/pagina4_b1amox.jpg');">
@@ -97,35 +106,15 @@
         let initialBottom = 12;
 
         const startDrag = (e) => { isDragging = true; startY = e.clientY || e.touches[0].clientY; dragEl.style.transition = 'none'; };
-        const dragMove = (e) => {
-            if(!isDragging) return;
-            if(e.cancelable) e.preventDefault();
-            const currentY = e.clientY || (e.touches && e.touches[0].clientY);
-            const deltaY = startY - currentY;
-            const deltaPercent = (deltaY / window.innerHeight) * 100;
-            let targetBottom = initialBottom + deltaPercent;
-            
-            if (targetBottom > 45) { // Chegou ao centro
-                isDragging = false;
-                audio.play().catch(e => console.log(e));
-                goToPage(2);
-                return;
-            }
-            dragEl.style.bottom = Math.max(5, targetBottom) + '%';
-        };
-        const endDrag = () => {
-            if(!isDragging) return;
-            isDragging = false;
-            dragEl.style.transition = 'bottom 0.4s ease';
-            dragEl.style.bottom = '12%';
-        };
-
-        dragEl.addEventListener('mousedown', startDrag);
-        dragEl.addEventListener('touchstart', startDrag, {passive: false});
-        window.addEventListener('mousemove', dragMove);
-        window.addEventListener('touchmove', dragMove, {passive: false});
-        window.addEventListener('mouseup', endDrag);
-        window.addEventListener('touchend', endDrag);
+        .page {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background-size: cover; background-position: center;
+    opacity: 0; /* Começa invisível */
+    transition: opacity 0.8s ease, filter 0.8s ease;
+    filter: blur(10px); /* Começa embaçado */
+    display: none;
+    z-index: 10;
+}
 
         function goToPage(num) {
             // Verifica se a página destino existe no código antes de tentar abrir
