@@ -14,25 +14,26 @@
         .story-container {
             width: 100%; max-width: 56.25dvh; height: 100dvh; position: relative; overflow: hidden;
         }
+        /* Ajuste do CSS das páginas */
         .page {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background-size: cover; background-position: center;
-    opacity: 0; /* Começa invisível */
-    transition: opacity 0.8s ease, filter 0.8s ease;
-    filter: blur(10px); /* Começa embaçado */
-    display: none;
-    z-index: 10;
-}
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-size: cover; background-position: center;
+            opacity: 0; 
+            visibility: hidden;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            transform: translateY(20px); /* Começa levemente abaixo */
+            z-index: 10;
+        }
         .page.active { 
-    display: block; 
-    opacity: 1; 
-    filter: blur(0px); /* Foca ao aparecer */
-}
+            opacity: 1; 
+            visibility: visible;
+            transform: translateY(0); /* Desliza para o lugar */
+        }
         
         /* Drag P1 */
         #drag-el {
             position: absolute; bottom: 12%; left: 50%; transform: translateX(-50%);
-            width: 240px; height: 240px; background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782222540/elemento_yryqdp.png');
+            width: 180px; height: 180px; background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782230953/elemento_tdqwih.png');
             background-size: contain; background-repeat: no-repeat; background-position: center;
             z-index: 50; cursor: grab; touch-action: none;
         }
@@ -71,7 +72,7 @@
             <button id="btn-skip" class="control-btn" style="display:none;" onclick="skipP2()">PULAR ➔</button>
         </div>
 
-        <div id="page-1" class="page active" style="background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782222568/pagina1_dr8x2y.jpg');">
+        <div id="page-1" class="page active" style="background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782231689/pagina1_sz4xmt.jpg');">
             <div id="drag-el"></div>
         </div>
 
@@ -80,17 +81,25 @@
         </div>
 
         <div id="page-3" class="page" style="background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782222593/pagina3_lofl13.jpg');">
-      <a href="Link: https://wa.me/5571993233142" target="_blank" class="hotspot" style="top:49.52%; left:8.63%; width:26.06%; height:17.41%;"></a>
-      <a href="Link: https://maps.app.goo.gl/1D3JBDRJ" target="_blank" class="hotspot" style="top:48.74%; left:37.85%; width:26.06%; height:18.18%;"></a>
-      <div class="hotspot" onclick="goToPage(4)" style="top:48.74%; left:66.02%; width:26.76%; height:18.18%;"></div>
+      <div class="hotspot" onclick="goToPage(4)" style="top:48.55%; left:68.13%; width:23.59%; height:18.76%;"></div>
+      <a href="https://maps.app.goo.gl/HFHwpFUTUmKPLjcHA" target="_blank" class="hotspot" style="top:50.48%; left:37.50%; width:24.30%; height:17.79%;"></a>
+      <a href="https://wa.me/5571993233142" target="_blank" class="hotspot" style="top:50.10%; left:10.74%; width:24.30%; height:19.54%;"></a>
         </div>
 
         <div id="page-4" class="page" style="background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782222618/pagina4_b1amox.jpg');">
             <button class="btn-back" onclick="goToPage(3)">✕ Voltar</button>
-
+      <div class="hotspot" onclick="goToPage(5)" style="top:45.26%; left:30.11%; width:36.62%; height:8.90%;"></div>
         </div>
 
+        <div id="page-5" class="page" style="background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782229806/pagina5_eyreqe.jpg');">
+            <button class="btn-back" onclick="goToPage(3)">✕ Voltar</button>
+      <div class="hotspot" onclick="goToPage(6)" style="top:45.45%; left:37.15%; width:38.73%; height:24.37%;"></div>
+        </div>
 
+        <div id="page-6" class="page" style="background-image: url('https://res.cloudinary.com/dtshawz5x/image/upload/v1782229835/pagina6_bjsg2v.jpg');">
+            <button class="btn-back" onclick="goToPage(3)">✕ Voltar</button>
+
+        </div>
     </div>
 
     <script>
@@ -100,21 +109,54 @@
         const btnSound = document.getElementById('btn-sound');
         const isVideo = true;
 
-        // Lógica de Arrastar (Drag to Center)
+        // Lógica de Arrastar Livre
         let isDragging = false;
-        let startY = 0;
-        let initialBottom = 12;
+        let offsetX, offsetY;
 
-        const startDrag = (e) => { isDragging = true; startY = e.clientY || e.touches[0].clientY; dragEl.style.transition = 'none'; };
-        .page {
-    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background-size: cover; background-position: center;
-    opacity: 0; /* Começa invisível */
-    transition: opacity 0.8s ease, filter 0.8s ease;
-    filter: blur(10px); /* Começa embaçado */
-    display: none;
-    z-index: 10;
-}
+        const startDrag = (e) => {
+            isDragging = true;
+            const clientX = e.clientX || e.touches[0].clientX;
+            const clientY = e.clientY || e.touches[0].clientY;
+            
+            // Calcula a distância do clique até o centro do elemento
+            offsetX = clientX - dragEl.getBoundingClientRect().left - (dragEl.offsetWidth / 2);
+            offsetY = clientY - dragEl.getBoundingClientRect().top - (dragEl.offsetHeight / 2);
+            
+            dragEl.style.transition = 'none';
+        };
+
+        const dragMove = (e) => {
+            if(!isDragging) return;
+            if(e.cancelable) e.preventDefault();
+            
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            
+            dragEl.style.left = (clientX - offsetX) + 'px';
+            dragEl.style.top = (clientY - offsetY) + 'px';
+            dragEl.style.bottom = 'auto'; // Remove a restrição do bottom
+            dragEl.style.transform = 'none'; // Reseta o transform do centro
+            
+            // Gatilho: Se arrastar para o centro da tela (exemplo)
+            const centerY = window.innerHeight / 2;
+            if (clientY < centerY + 50 && clientY > centerY - 50) {
+                 isDragging = false;
+                 audio.play().catch(e => console.log(e));
+                 goToPage(2);
+            }
+        };
+
+        const endDrag = () => {
+            isDragging = false;
+        };
+
+        dragEl.style.position = 'fixed'; // Garante que flutue sobre tudo
+        dragEl.addEventListener('mousedown', startDrag);
+        dragEl.addEventListener('touchstart', startDrag, {passive: false});
+        window.addEventListener('mousemove', dragMove);
+        window.addEventListener('touchmove', dragMove, {passive: false});
+        window.addEventListener('mouseup', endDrag);
+        window.addEventListener('touchend', endDrag);
 
         function goToPage(num) {
             // Verifica se a página destino existe no código antes de tentar abrir
